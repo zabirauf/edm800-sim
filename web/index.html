@@ -15,18 +15,10 @@
   <div class="hdr-right">
     <span id="time-banner" class="time-banner" hidden></span>
     <span id="clock" class="mono"></span>
-    <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults">EDM factory reset</button>
+    <button id="btn-disclaimer" class="ghost" type="button" title="Unofficial — not approved for flight training. Read the notice.">Disclaimer</button>
+    <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults"><span class="wide-only">EDM factory reset</span><span class="phone-only">Reset EDM</span></button>
   </div>
 </header>
-
-<div id="disclaimer-banner" class="disclaimer-banner" role="note">
-  <strong>Unofficial educational simulator.</strong>
-  <span class="dl-long">Not approved by the FAA or any aviation authority, not for flight-training credit or real-world
-    use, and not affiliated with or endorsed by J.P. Instruments, Cessna (Textron Aviation) or Lycoming. It may contain
-    errors — always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor.</span>
-  <span class="dl-short">Not approved for flight training · may contain errors.</span>
-  <button id="btn-disclaimer" class="linklike" type="button">Details</button>
-</div>
 
 <dialog id="disclaimer" class="disclaimer-dialog" aria-labelledby="disclaimer-title">
   <h2 id="disclaimer-title">Before you start</h2>
@@ -284,9 +276,6 @@
 </aside>
 
 <footer>
-  Unofficial educational simulator — not approved by the FAA or any aviation authority, not for flight-training credit or
-  real-world use, and not affiliated with or endorsed by J.P. Instruments, Textron Aviation (Cessna) or Lycoming. It may
-  contain errors: always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor. Provided as is (MIT License).
   Model calibration and every assumption are documented in docs/06–09 of the project and in the Instructor tab.
 </footer>
 <script type="module" src="app.js"></script>

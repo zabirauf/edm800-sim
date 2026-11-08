@@ -35,7 +35,7 @@ Use the hosted copy at https://zabirauf.github.io/edm800-sim/. GitHub Pages repu
 
 Or use `dist/edm800-simulator.html`: it's self-contained, so you can open it in any modern browser with no server.
 Rebuild after changes with `npm run build`. On the first visit the simulator shows the disclaimer above and asks you
-to acknowledge it. A short version stays in a banner at the top, and "Details" reopens the full text. Demo recordings: `dist/demo-desktop.gif` (full tour), `dist/demo-iphone.gif`,
+to acknowledge it. The "Disclaimer" button in the header reopens it. Demo recordings: `dist/demo-desktop.gif` (full tour), `dist/demo-iphone.gif`,
 `dist/demo-fold.gif` and `dist/demo-statemap.gif` (the state-machine view).
 
 It works on phones, tablets and foldables:
@@ -162,6 +162,7 @@ spec/tla/     TLA+ formal model (EDMCore.tla), TLC models (MC_*), generated impl
 | `npm run test:visual` | Build, then run the visual/responsive tests on 9 device profiles (below) |
 | `npm run test:visual:update` | Re-record the reference screenshots after an intended UI change |
 | `npm run test:visual:report` | Open the HTML report (side-by-side and slider diffs of any mismatch) |
+| `npm run shots` | Retake the README screenshots in `docs/media/` (after `npm run build`) |
 | `npm run demo:gif` | Record `dist/demo-{statemap,desktop,iphone,fold}.gif` (needs ffmpeg) |
 | `npm run verify` | Everything before a release: unit tests, the TLA+ formal check, then the visual tests (≈10 min) |
 | `npm run tla` | Formal check: explore the implementation, then TLC model-checks `spec/tla/EDMCore.tla` and judges the implementation against it (needs Java 11+ and `tla2tools.jar`) |

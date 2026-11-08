@@ -44,6 +44,7 @@ the EDM-711 (§13). The unit tests cover these.
 | `npm run test:visual` | Playwright visual/responsive tests on 9 devices, ≈3 min; `test:visual:update` after an intended UI change |
 | `npm run verify` | All of the above; run before a release |
 | `npm run build` | Rebuild `dist/edm800-simulator.html` after any change under `src/` or `web/` |
+| `npm run shots` / `npm run demo:gif` | After visible UI changes: retake the README screenshots (`docs/media/`) and demo GIFs |
 
 ## Don't hand-edit
 

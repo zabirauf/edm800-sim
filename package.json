@@ -18,7 +18,8 @@
     "demo:gif": "npm run build && node scripts/record-demo.mjs",
     "tla": "bash scripts/tla-check.sh",
     "tla:impl": "node tools/tla-conformance.mjs",
-    "verify": "npm test && npm run tla && npm run test:visual"
+    "verify": "npm test && npm run tla && npm run test:visual",
+    "shots": "node scripts/readme-shots.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.52.0"

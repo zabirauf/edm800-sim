@@ -227,6 +227,7 @@ button, .hw { touch-action: manipulation; -webkit-tap-highlight-color: transpare
 .hw, .holdable { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 #face { -webkit-user-select: none; -webkit-touch-callout: none; }
 .annunciator.mini { display: none; }
+.phone-only { display: none; }
 .scroll-x { overflow-x: auto; }
 @media (pointer: coarse), (hover: none) {
   /* iOS zooms into any text field under 16 px; keep targets ≥ 36 px */
@@ -473,11 +474,6 @@ body.explaining #alarm-light[data-ex-n]::after, body.explaining #alarm-mini[data
 }
 
 /* ---------- disclaimer */
-.disclaimer-banner { display: block; padding: 6px 18px; background: #2a1d05; border-bottom: 1px solid #6b4e0e; color: #f3d9a4; font-size: 12px; line-height: 1.4; }
-.disclaimer-banner strong { color: var(--warn); margin-right: 4px; }
-.disclaimer-banner .linklike { margin-left: 4px; }
-.disclaimer-banner .dl-short { display: none; }
-button.linklike { background: none; border: none; padding: 0; color: #ffcf66; text-decoration: underline; font-size: inherit; cursor: pointer; min-height: 0; }
 .disclaimer-dialog { max-width: min(620px, calc(100vw - 24px)); background: #141920; color: var(--text); border: 2px solid var(--accent); border-radius: 12px; padding: 16px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
 .disclaimer-dialog::backdrop { background: rgba(0, 0, 0, .7); }
 .disclaimer-dialog h2 { margin: 0 0 8px; color: var(--accent); font-size: 18px; }
@@ -486,10 +482,10 @@ button.linklike { background: none; border: none; padding: 0; color: #ffcf66; te
 .disclaimer-dialog .row { justify-content: flex-end; }
 button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 700; padding: 8px 16px; }
 @media (max-width: 719px) {
-  .disclaimer-banner { padding: 5px 10px; font-size: 11.5px; }
-  .disclaimer-banner .dl-long { display: none; }
-  .disclaimer-banner .dl-short { display: inline; }
   .disclaimer-dialog { padding: 12px 14px; font-size: 13.5px; }
+  header .hdr-right button { padding: 4px 8px; font-size: 12px; }
+  .wide-only { display: none; }
+  .phone-only { display: inline; }
 }
 
 </style>
@@ -503,18 +499,10 @@ button.primary { background: var(--accent); color: #111; border-color: var(--acc
   <div class="hdr-right">
     <span id="time-banner" class="time-banner" hidden></span>
     <span id="clock" class="mono"></span>
-    <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults">EDM factory reset</button>
+    <button id="btn-disclaimer" class="ghost" type="button" title="Unofficial — not approved for flight training. Read the notice.">Disclaimer</button>
+    <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults"><span class="wide-only">EDM factory reset</span><span class="phone-only">Reset EDM</span></button>
   </div>
 </header>
-
-<div id="disclaimer-banner" class="disclaimer-banner" role="note">
-  <strong>Unofficial educational simulator.</strong>
-  <span class="dl-long">Not approved by the FAA or any aviation authority, not for flight-training credit or real-world
-    use, and not affiliated with or endorsed by J.P. Instruments, Cessna (Textron Aviation) or Lycoming. It may contain
-    errors — always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor.</span>
-  <span class="dl-short">Not approved for flight training · may contain errors.</span>
-  <button id="btn-disclaimer" class="linklike" type="button">Details</button>
-</div>
 
 <dialog id="disclaimer" class="disclaimer-dialog" aria-labelledby="disclaimer-title">
   <h2 id="disclaimer-title">Before you start</h2>
@@ -772,9 +760,6 @@ button.primary { background: var(--accent); color: #111; border-color: var(--acc
 </aside>
 
 <footer>
-  Unofficial educational simulator — not approved by the FAA or any aviation authority, not for flight-training credit or
-  real-world use, and not affiliated with or endorsed by J.P. Instruments, Textron Aviation (Cessna) or Lycoming. It may
-  contain errors: always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor. Provided as is (MIT License).
   Model calibration and every assumption are documented in docs/06–09 of the project and in the Instructor tab.
 </footer>
 <script>
