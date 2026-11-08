@@ -1,0 +1,26 @@
+{
+  "name": "edm800-sim",
+  "version": "1.0.0",
+  "description": "JPI EDM-800 engine monitor state machine and training simulator",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.mjs test/sim/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "test:edm": "node --test test/*.test.mjs",
+    "test:sim": "node --test test/sim/*.test.mjs",
+    "fit": "node tools/fit.mjs",
+    "test:visual": "npm run build && playwright test",
+    "test:visual:update": "npm run build && playwright test --update-snapshots",
+    "test:visual:report": "playwright show-report",
+    "webkit:deps": "bash scripts/webkit-deps.sh",
+    "demo:gif": "npm run build && node scripts/record-demo.mjs",
+    "tla": "bash scripts/tla-check.sh",
+    "tla:impl": "node tools/tla-conformance.mjs",
+    "verify": "npm test && npm run tla && npm run test:visual"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.52.0"
+  }
+}

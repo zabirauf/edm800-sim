@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDM-800 Trainer — Cessna 177B Cardinal / Lycoming O-360</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>EDM-800 Trainer</h1>
+    <span class="sub">JPI EDM-800 in a Cessna 177B Cardinal · Lycoming O-360-A1F6D model calibrated to the POH and Lycoming data</span>
+  </div>
+  <div class="hdr-right">
+    <span id="time-banner" class="time-banner" hidden></span>
+    <span id="clock" class="mono"></span>
+    <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults">EDM factory reset</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============================== instrument panel -->
+  <section class="panel" id="panel">
+    <div class="instrument-row">
+      <div class="side-controls left">
+        <div class="ctl-block">
+          <div class="ctl-label">MASTER</div>
+          <button id="btn-master" class="toggle-switch" aria-pressed="false" title="Battery master (powers the EDM)"><span class="knob"></span></button>
+          <label class="tiny-check"><input type="checkbox" id="chk-step-at-power"> hold STEP at power-on</label>
+        </div>
+        <div class="ctl-block" id="switch-block">
+          <div class="ctl-label">EDM SELECT</div>
+          <div class="three-way" id="select-switch">
+            <button data-pos="T">EGT</button><button data-pos="A" class="active">ALL</button><button data-pos="F">FF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="instrument">
+        <div id="alarm-mini" class="annunciator mini" aria-hidden="true">ALARM</div>
+        <button id="btn-explain" class="explain-btn" aria-pressed="false" title="Explain everything on the display (E)">? Explain</button>
+        <svg id="face" viewBox="0 0 400 400" role="img" aria-label="EDM-800 display"></svg>
+        <div class="hw-buttons">
+          <button id="btn-step" class="hw" aria-label="STEP button"><span>STEP</span></button>
+          <div id="hold-meter" class="hold-meter"><div class="bar"></div><span class="txt"></span></div>
+          <button id="btn-lf" class="hw" aria-label="LF button"><span>LF</span></button>
+        </div>
+      </div>
+
+      <div class="side-controls right">
+        <div class="ctl-block">
+          <div class="ctl-label">ENGINE MONITOR</div>
+          <div id="alarm-light" class="annunciator">ALARM</div>
+        </div>
+        <div class="ctl-block" id="lamps711-block" hidden>
+          <div class="ctl-label">ENGINE TEMP LIMIT</div>
+          <div class="lamps711"><div><span id="lamp-cht" class="lamp"></span>CHT</div><div><span id="lamp-oil" class="lamp"></span>OIL</div><div><span id="lamp-tit" class="lamp"></span>TIT</div></div>
+        </div>
+        <div class="ctl-block">
+          <div class="ctl-label">DATA</div>
+          <button id="btn-usb" class="small">Insert USB drive</button>
+          <button id="btn-membox" class="small">Connect memory box</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gesture-helpers">
+      <span class="hint">Keys: <kbd>S</kbd> STEP · <kbd>L</kbd> LF · <kbd>B</kbd> both · <kbd>↓</kbd>/<kbd>↑</kbd> lean/enrich · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> throttle · <kbd>P</kbd> pause · <kbd>E</kbd> explain</span>
+      <button data-gesture="tapBoth">Tap both</button>
+      <button data-gesture="holdBoth">Hold both 5 s</button>
+      <button data-gesture="holdLF">Hold LF 3 s</button>
+      <button data-gesture="holdStep">Hold STEP 5 s</button>
+    </div>
+
+    <div class="status-bar">
+      <div><span class="k">EDM state</span> <span id="st-path" class="mono"></span></div>
+      <div><span class="k">Mode</span> <span id="st-mode"></span></div>
+      <div><span class="k">View</span> <span id="st-view"></span></div>
+      <div><span class="k">Last gesture</span> <span id="st-gesture" class="mono"></span></div>
+    </div>
+
+    <div class="help-box" id="help-box">
+      <h3 id="help-title"></h3>
+      <ul id="help-lines"></ul>
+    </div>
+
+    <!-- steam gauges / airplane state -->
+    <div class="gauges" id="gauges"></div>
+  </section>
+
+  <!-- ============================== right side tabs -->
+  <section class="side">
+    <!-- floating "next step" card for the running scenario / lesson, shown on the other tabs -->
+    <div id="coach" class="coach" hidden>
+      <div class="coach-top">
+        <span class="coach-kind"></span>
+        <span class="coach-title"></span>
+        <span class="coach-progress"></span>
+        <button class="coach-open small" title="Show the whole scenario">Open</button>
+        <button class="coach-toggle ghost small" aria-expanded="true" title="Collapse / expand">▾</button>
+      </div>
+      <div class="coach-body">
+        <div class="coach-step" aria-live="polite"></div>
+        <div class="coach-note"></div>
+        <div class="coach-warn"></div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="cockpit" class="active">Cockpit</button>
+      <button data-tab="scenarios">Scenarios</button>
+      <button data-tab="lessons">EDM lessons</button>
+      <button data-tab="diagnose">Diagnose</button>
+      <button data-tab="faults">Faults</button>
+      <button data-tab="instructor">Instructor</button>
+      <button data-tab="menus">Menu map</button>
+      <button data-tab="install">Installation</button>
+      <button data-tab="reference">Reference</button>
+      <button data-tab="statemap" title="Developer view: the whole EDM state machine, live">State machine</button>
+    </nav>
+
+    <div class="tab" id="tab-cockpit">
+      <div class="quick-setups">
+        <span class="muted">Quick set-up:</span>
+        <button data-setup="cold">Cold &amp; dark</button>
+        <button data-setup="runup">Engine running, run-up</button>
+        <button data-setup="cruise">Cruise 6000 ft</button>
+      </div>
+      <div class="levers">
+        <div class="lever throttle"><label>Throttle <span id="v-throttle"></span></label><input type="range" id="in-throttle" min="0" max="1" step="0.002"></div>
+        <div class="lever prop"><label>Propeller <span id="v-prop"></span></label><input type="range" id="in-prop" min="0" max="1" step="0.005"></div>
+        <div class="lever mixture"><label>Mixture <span id="v-mixture"></span></label><input type="range" id="in-mixture" min="0" max="1" step="0.0005">
+          <div class="lean-btns"><button id="btn-enrich" class="holdable" title="Enrich (↑)">▲ Enrich</button><button id="btn-lean" class="holdable" title="Lean (↓)">▼ Lean</button>
+            <select id="lean-rate" title="Lean rate"><option value="0.004">slow (~4°F/s)</option><option value="0.009" selected>normal (~10°F/s)</option><option value="0.02">fast</option></select>
+            <button id="btn-cutoff" class="ghost" title="Idle cut-off">Idle cut-off</button></div>
+        </div>
+        <div class="lever heat"><label>Carb heat <span id="v-heat"></span></label><input type="range" id="in-heat" min="0" max="1" step="0.01"></div>
+        <div class="lever cowl"><label>Cowl flaps <span id="v-cowl"></span></label><input type="range" id="in-cowl" min="0" max="1" step="0.01"></div>
+      </div>
+      <div class="row switches">
+        <label>Magnetos <select id="in-mags"><option>OFF</option><option>R</option><option>L</option><option selected>BOTH</option></select></label>
+        <button id="btn-start" class="holdable" title="Hold to crank (magnetos START)">Start (hold)</button>
+        <button id="btn-prime" title="One primer stroke">Prime <span id="v-prime">0</span></button>
+        <label class="check"><input type="checkbox" id="chk-alt" checked> Alternator</label>
+        <label class="check"><input type="checkbox" id="chk-aux"> Aux fuel pump</label>
+        <label>Fuel <select id="in-fuel"><option>L</option><option selected>BOTH</option><option>R</option><option>OFF</option></select></label>
+      </div>
+      <div class="row flightpath">
+        <label>Flight path <select id="in-mode"></select></label>
+        <label>IAS <input type="number" id="in-ias" min="50" max="160" step="1" value="79"> kt</label>
+        <label>VS <input type="number" id="in-vs" min="-2000" max="0" step="100" value="-500"> fpm</label>
+        <label>Flaps <select id="in-flaps"><option value="0">0°</option><option value="0.5">20°</option><option value="1">40°</option></select></label>
+      </div>
+      <div class="row environment">
+        <label>Field elev <input type="number" id="in-field" min="0" max="9000" step="100" value="0"> ft</label>
+        <label>ISA dev <input type="number" id="in-isa" min="-50" max="50" step="1" value="0"> °F</label>
+        <label>RH <input type="number" id="in-rh" min="0" max="100" step="5" value="50"> %</label>
+        <label>Headwind <input type="number" id="in-wind" min="-40" max="60" step="5" value="0"> kt</label>
+      </div>
+      <div class="row time">
+        <button id="btn-pause">Pause</button>
+        <button data-ff="30">+30 s</button><button data-ff="120">+2 min</button><button data-ff="300">+5 min</button>
+        <span class="muted small">Fast-forward advances the engine and the EDM together and stops on any new alarm or scenario event.</span>
+      </div>
+      <div class="truth scroll-x" id="truth"></div>
+    </div>
+
+    <div class="tab" id="tab-scenarios" hidden>
+      <p class="muted">Practice conditions in the Cardinal. Objectives are checked automatically against the engine and the EDM; the debrief cites the POH, Lycoming and the Pilot's Guide.</p>
+      <div id="scenario-list" class="scenario-list"></div>
+      <div id="scenario-active" class="scenario-active" hidden>
+        <h3 id="scn-title"></h3>
+        <p id="scn-brief"></p>
+        <div id="scn-notes" class="scn-notes"></div>
+        <ol id="scn-steps"></ol>
+        <div id="scn-fail" class="scn-fail"></div>
+        <div id="scn-debrief" class="scn-debrief" hidden></div>
+        <div class="row"><button id="btn-scn-restart">Restart</button><button id="btn-scn-close" class="ghost">Back to list</button></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-lessons" hidden>
+      <p class="muted">Guided exercises for operating the EDM-800. Each step is checked automatically.</p>
+      <div id="lesson-list" class="lesson-list"></div>
+      <div id="lesson-active" class="lesson-active" hidden>
+        <h3 id="lesson-title"></h3>
+        <ol id="lesson-steps"></ol>
+        <div class="row"><button id="btn-lesson-restart">Restart lesson</button><button id="btn-lesson-close" class="ghost">Back to list</button></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-diagnose" hidden>
+      <p class="muted">A hidden problem is injected in cruise. Read the EDM — bar graph, Normalize view, step through the cylinders, DIF, CHT, a brief magneto check — and pick the most probable cause (Pilot's Guide p.22–24).</p>
+      <div class="row"><button id="btn-mystery">New mystery problem</button></div>
+      <div id="mystery-choices" class="choices"></div>
+      <div id="mystery-result" class="result"></div>
+    </div>
+
+    <div class="tab" id="tab-faults" hidden>
+      <h3>Engine &amp; system faults</h3>
+      <div id="fault-list" class="fault-list"></div>
+      <h3>Fuel</h3>
+      <div class="row"><label>Fuel grade <select id="in-octane"><option value="100">100LL</option><option value="80">80 octane (misfuel)</option></select></label>
+        <button id="btn-fill-tanks">Fill both tanks (49 gal)</button><span id="v-tanks" class="mono"></span></div>
+      <h3>Probe failures <span class="muted">(self-test reports them at the next power-up)</span></h3>
+      <div id="probe-list" class="probe-list"></div>
+      <h3>GPS</h3>
+      <div class="row">
+        <label>Status <select id="in-gps"><option value="ok">OK (valid signal + waypoint)</option><option value="off">No data / GPS off</option><option value="nocom">NO-COM (protocol setup)</option><option value="nosig">NO-SIG</option><option value="nowpt">NO-WPT</option></select></label>
+        <label class="check"><input type="checkbox" id="chk-offcourse"> Track &gt;70° off course</label>
+        <label>Distance <input type="number" id="in-dist" min="0" step="10"> nm</label>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-instructor" hidden>
+      <p class="muted">Engine personality and every ASSUMED / TYPICAL model value can be changed within its range. Tags show where each number comes from.</p>
+      <div class="row"><label>Engine personality <select id="in-personality"></select></label></div>
+      <div id="param-list" class="param-list"></div>
+      <h3>About this simulation</h3>
+      <div id="about" class="about"></div>
+    </div>
+
+    <div class="tab" id="tab-menus" hidden>
+      <p class="muted">Where you are in the instrument's menus. Grey items are hidden by the select switch or not installed.</p>
+      <div id="menu-map" class="menu-map"></div>
+    </div>
+
+    <div class="tab" id="tab-install" hidden>
+      <p class="muted">EDM options installed in this Cardinal (4 cylinders, O-360). An installation change power-cycles the EDM; programmed settings are kept.</p>
+      <form id="install-form" class="install">
+        <label>Model <select name="model"><option value="800">EDM-800</option><option value="700">EDM-700</option></select></label>
+        <label class="check"><input type="checkbox" name="primary711"> Primary (EDM-711 alarm lamps)</label>
+        <label class="check"><input type="checkbox" name="oil"> Oil temp</label>
+        <label class="check"><input type="checkbox" name="oat"> OAT</label>
+        <label class="check"><input type="checkbox" name="crb"> Carb temp</label>
+        <label class="check"><input type="checkbox" name="ff"> Fuel flow option</label>
+        <label class="check"><input type="checkbox" name="gps"> GPS interface</label>
+        <label class="check"><input type="checkbox" name="usbPort"> Panel USB port</label>
+        <label>Transducer K <input type="number" name="transducerK" step="0.01" min="1" max="99.99"></label>
+        <div class="row"><button type="submit">Apply installation</button></div>
+      </form>
+    </div>
+
+    <div class="tab reference" id="tab-reference" hidden></div>
+
+    <div class="tab statemap" id="tab-statemap" hidden></div>
+  </section>
+</main>
+
+<aside id="explain" class="explain" hidden aria-label="Display explanation">
+  <div class="ex-head">
+    <strong>What the display is showing</strong>
+    <span class="ex-mode muted small"></span>
+    <label class="check small"><input type="checkbox" id="ex-live"> Live</label>
+    <button id="ex-close" class="ghost" title="Close (Esc)">✕</button>
+  </div>
+  <p class="ex-tip muted small">Tap a numbered part of the display — or anything on it — to jump to its explanation. STEP and LF still work: press them and this updates.</p>
+  <div class="ex-body"></div>
+</aside>
+
+<footer>
+  Training aid only — not a substitute for the JPI Pilot's Guide, the Cessna 177B POH, Lycoming publications or flight
+  instruction. Model calibration and every assumption are documented in docs/06-ENGINE-SIM-PLAN.md and the Instructor tab.
+</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
