@@ -13,6 +13,8 @@ export const test = base.extend({
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.addInitScript(() => {
+      // a returning visitor: the first-visit disclaimer was acknowledged (it has its own test)
+      localStorage.setItem('edm800-disclaimer-ack-v1', '1');
       let s = 20261027;
       Math.random = () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296;
     });

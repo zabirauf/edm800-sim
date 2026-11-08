@@ -133,7 +133,7 @@ function gesture(kind) {
 function bindKeyboard() {
   const keyMap = { s: ['STEP'], l: ['LF'], b: ['STEP', 'LF'] };
   window.addEventListener('keydown', (e) => {
-    if (e.target.closest('input, select, textarea')) return;
+    if (e.target.closest('input, select, textarea') || document.querySelector('dialog[open]')) return;
     const k = e.key.toLowerCase();
     if (keyMap[k]) {
       if (!e.repeat) keyMap[k].forEach((b) => press(b, `key-${k}`));
@@ -875,9 +875,39 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
+// ------------------------------------------------------------------ disclaimer
+
+const DISCLAIMER_KEY = 'edm800-disclaimer-ack-v1';
+
+/** Not approved for training: a permanent banner, and a notice that must be acknowledged on the first visit. */
+function initDisclaimer() {
+  const dlg = $('#disclaimer');
+  const acknowledged = () => {
+    try {
+      return localStorage.getItem(DISCLAIMER_KEY) === '1';
+    } catch {
+      return false;
+    }
+  };
+  $('#btn-disclaimer').addEventListener('click', () => dlg.showModal());
+  $('#btn-disclaimer-ok').addEventListener('click', () => {
+    try {
+      localStorage.setItem(DISCLAIMER_KEY, '1');
+    } catch {
+      /* storage unavailable: the notice shows again next time */
+    }
+    dlg.close();
+  });
+  dlg.addEventListener('cancel', (e) => {
+    if (!acknowledged()) e.preventDefault(); // the first time it has to be acknowledged, not escaped
+  });
+  if (!acknowledged()) dlg.showModal();
+}
+
 // ------------------------------------------------------------------ init
 
 function init() {
+  initDisclaimer();
   const stored = loadStored();
   (stored?.done || []).forEach((d) => app.done.add(d));
   app.config = { ...CARDINAL_EDM_CONFIG, ...(stored?.config || {}), cylinders: 4, tit: 0 };
@@ -909,6 +939,10 @@ function init() {
     getAnchors: () => {
       const phone = matchMedia('(max-width: 719px)').matches;
       return phone ? { phone, top: Math.round($('.instrument').getBoundingClientRect().bottom) } : { phone, left: Math.round($('.panel').getBoundingClientRect().right + 8) };
+    },
+    pin: () => {
+      const y = $('.instrument').getBoundingClientRect().top;
+      if (y > 0) scrollBy(0, y);
     },
   });
   $$('#tabs button').forEach((b) =>

@@ -51,7 +51,7 @@ function edgePath(a, b, bend) {
   return { d: `M${p0[0].toFixed(1)},${p0[1].toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p1[0].toFixed(1)},${p1[1].toFixed(1)}`, lx, ly };
 }
 
-export function createStateMapView({ host, getEdm, getConfig, getAnchors }) {
+export function createStateMapView({ host, getEdm, getConfig, getAnchors, pin = () => {} }) {
   host.innerHTML = `
     <div class="sm-toolbar">
       <button class="sm-zoom-out" title="Zoom out (−)">−</button>
@@ -457,8 +457,10 @@ export function createStateMapView({ host, getEdm, getConfig, getAnchors }) {
     ui.expanded = on;
     host.classList.toggle('sm-expanded', on);
     $('.sm-expand').textContent = on ? 'Restore' : 'Expand';
-    if (on) place();
-    else Object.assign(host.style, { top: '', left: '' });
+    if (on) {
+      if (getAnchors().phone) pin(); // phones: pin the instrument at the very top so the map gets the rest
+      place();
+    } else Object.assign(host.style, { top: '', left: '' });
     requestAnimationFrame(() => (ui.cur ? centerOn(ui.cur, ui.k) : fit(false)));
   }
 

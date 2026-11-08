@@ -1,6 +1,25 @@
 # EDM-800 Trainer — Cessna 177B Cardinal / Lycoming O-360
 
-A training simulator for the **JPI EDM-800** engine monitor, built from the JPI Pilot's Guide (EDM-700/800/711,
+> [!WARNING]
+> **Unofficial educational simulator — not approved for flight training.**
+> - This is a personal project for familiarisation and study. It is not approved, certified or endorsed by the FAA or
+>   any other aviation authority, and using it does not count toward any training, currency, rating or certificate.
+> - It is not affiliated with, endorsed by or supported by J.P. Instruments, Textron Aviation (Cessna) or Lycoming.
+>   Product names are used only to describe what is simulated.
+> - The instrument behaviour and the engine model are approximations and may be wrong. Don't use it to make decisions
+>   about a real aircraft or flight. Always follow the J.P. Instruments Pilot's Guide, the aircraft's POH/AFM, the
+>   engine manufacturer's guidance and your flight instructor.
+> - Provided "as is", without warranty of any kind (see `LICENSE`).
+
+**▶ Try it in your browser: https://zabirauf.github.io/edm800-sim/** — works on desktop, tablets and phones.
+
+![The simulator in cruise: LeanFind has just found the leanest cylinder](docs/media/hero-leanfind.png)
+
+| Explain what the display shows | The whole state machine, live | Scenarios on a phone |
+|---|---|---|
+| ![Explain panel](docs/media/explain.png) | ![State-machine view](docs/media/state-machine.png) | ![Run-up scenario on an iPhone](docs/media/phone-scenario.png) |
+
+A simulator for learning the **JPI EDM-800** engine monitor, built from the JPI Pilot's Guide (EDM-700/800/711,
 Rev W). It is set up as installed in a **Cessna 177B Cardinal with a Lycoming O-360-A1F6D (180 HP, carbureted,
 constant-speed prop)**. It has three parts:
 
@@ -11,8 +30,12 @@ constant-speed prop)**. It has three parts:
 
 ## Open the simulator
 
-`dist/edm800-simulator.html` is self-contained — open it in any modern browser (no server needed).
-Rebuild after changes with `npm run build`. Demo recordings: `dist/demo-desktop.gif` (full tour), `dist/demo-iphone.gif`,
+Use the hosted copy at https://zabirauf.github.io/edm800-sim/. GitHub Pages republishes it on every push to `main`
+(`.github/workflows/pages.yml`).
+
+Or use `dist/edm800-simulator.html`: it's self-contained, so you can open it in any modern browser with no server.
+Rebuild after changes with `npm run build`. On the first visit the simulator shows the disclaimer above and asks you
+to acknowledge it. A short version stays in a banner at the top, and "Details" reopens the full text. Demo recordings: `dist/demo-desktop.gif` (full tour), `dist/demo-iphone.gif`,
 `dist/demo-fold.gif` and `dist/demo-statemap.gif` (the state-machine view).
 
 It works on phones, tablets and foldables:

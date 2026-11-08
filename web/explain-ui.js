@@ -167,7 +167,7 @@ export function initExplain({ getEdm, getSim, getFace, isPaused, setPaused, rele
   addEventListener('resize', () => ui.open && place());
   addEventListener('scroll', () => ui.open && place(), { passive: true });
   addEventListener('keydown', (e) => {
-    if (e.target.closest?.('input, select, textarea')) return;
+    if (e.target.closest?.('input, select, textarea') || document.querySelector('dialog[open]')) return;
     if (e.key === 'Escape' && ui.open) close();
     else if (e.key.toLowerCase() === 'e' && !e.repeat && !e.ctrlKey && !e.metaKey) ui.open ? close() : open();
   });

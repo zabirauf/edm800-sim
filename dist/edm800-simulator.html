@@ -472,6 +472,26 @@ body.explaining #alarm-light[data-ex-n]::after, body.explaining #alarm-mini[data
   .tab.statemap.sm-expanded { left: 0; border-left: none; border-top: 2px solid var(--accent); }
 }
 
+/* ---------- disclaimer */
+.disclaimer-banner { display: block; padding: 6px 18px; background: #2a1d05; border-bottom: 1px solid #6b4e0e; color: #f3d9a4; font-size: 12px; line-height: 1.4; }
+.disclaimer-banner strong { color: var(--warn); margin-right: 4px; }
+.disclaimer-banner .linklike { margin-left: 4px; }
+.disclaimer-banner .dl-short { display: none; }
+button.linklike { background: none; border: none; padding: 0; color: #ffcf66; text-decoration: underline; font-size: inherit; cursor: pointer; min-height: 0; }
+.disclaimer-dialog { max-width: min(620px, calc(100vw - 24px)); background: #141920; color: var(--text); border: 2px solid var(--accent); border-radius: 12px; padding: 16px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
+.disclaimer-dialog::backdrop { background: rgba(0, 0, 0, .7); }
+.disclaimer-dialog h2 { margin: 0 0 8px; color: var(--accent); font-size: 18px; }
+.disclaimer-dialog ul { margin: 0 0 12px; padding-left: 20px; }
+.disclaimer-dialog li { margin: 6px 0; line-height: 1.45; }
+.disclaimer-dialog .row { justify-content: flex-end; }
+button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 700; padding: 8px 16px; }
+@media (max-width: 719px) {
+  .disclaimer-banner { padding: 5px 10px; font-size: 11.5px; }
+  .disclaimer-banner .dl-long { display: none; }
+  .disclaimer-banner .dl-short { display: inline; }
+  .disclaimer-dialog { padding: 12px 14px; font-size: 13.5px; }
+}
+
 </style>
 </head>
 <body>
@@ -486,6 +506,31 @@ body.explaining #alarm-light[data-ex-n]::after, body.explaining #alarm-mini[data
     <button id="btn-reset-settings" class="ghost" title="Restore EDM settings to factory defaults">EDM factory reset</button>
   </div>
 </header>
+
+<div id="disclaimer-banner" class="disclaimer-banner" role="note">
+  <strong>Unofficial educational simulator.</strong>
+  <span class="dl-long">Not approved by the FAA or any aviation authority, not for flight-training credit or real-world
+    use, and not affiliated with or endorsed by J.P. Instruments, Cessna (Textron Aviation) or Lycoming. It may contain
+    errors — always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor.</span>
+  <span class="dl-short">Not approved for flight training · may contain errors.</span>
+  <button id="btn-disclaimer" class="linklike" type="button">Details</button>
+</div>
+
+<dialog id="disclaimer" class="disclaimer-dialog" aria-labelledby="disclaimer-title">
+  <h2 id="disclaimer-title">Before you start</h2>
+  <ul>
+    <li><b>Unofficial personal project</b> for familiarisation and study. It is <b>not approved, certified or endorsed by
+      the FAA or any other aviation authority</b>, and using it does not count toward any training, currency, rating or
+      certificate.</li>
+    <li><b>Not affiliated with, endorsed by or supported by J.P. Instruments, Textron Aviation (Cessna) or Lycoming.</b>
+      Product names are used only to describe what is being simulated.</li>
+    <li>The instrument behaviour and the engine model are <b>approximations and may be wrong</b>. Do not use this to make
+      decisions about a real aircraft or flight. Always follow the J.P. Instruments Pilot's Guide, the aircraft's POH/AFM,
+      the engine manufacturer's guidance and your flight instructor.</li>
+    <li>Provided "as is", without warranty of any kind (MIT License).</li>
+  </ul>
+  <div class="row"><button id="btn-disclaimer-ok" type="button" class="primary">I understand</button></div>
+</dialog>
 
 <main>
   <!-- ============================== instrument panel -->
@@ -727,8 +772,10 @@ body.explaining #alarm-light[data-ex-n]::after, body.explaining #alarm-mini[data
 </aside>
 
 <footer>
-  Training aid only — not a substitute for the JPI Pilot's Guide, the Cessna 177B POH, Lycoming publications or flight
-  instruction. Model calibration and every assumption are documented in docs/06-ENGINE-SIM-PLAN.md and the Instructor tab.
+  Unofficial educational simulator — not approved by the FAA or any aviation authority, not for flight-training credit or
+  real-world use, and not affiliated with or endorsed by J.P. Instruments, Textron Aviation (Cessna) or Lycoming. It may
+  contain errors: always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor. Provided as is (MIT License).
+  Model calibration and every assumption are documented in docs/06–09 of the project and in the Instructor tab.
 </footer>
 <script>
 (() => {
@@ -6796,7 +6843,7 @@ function initExplain({ getEdm, getSim, getFace, isPaused, setPaused, releaseAll 
   addEventListener('resize', () => ui.open && place());
   addEventListener('scroll', () => ui.open && place(), { passive: true });
   addEventListener('keydown', (e) => {
-    if (e.target.closest?.('input, select, textarea')) return;
+    if (e.target.closest?.('input, select, textarea') || document.querySelector('dialog[open]')) return;
     if (e.key === 'Escape' && ui.open) close();
     else if (e.key.toLowerCase() === 'e' && !e.repeat && !e.ctrlKey && !e.metaKey) ui.open ? close() : open();
   });
@@ -7540,7 +7587,7 @@ function edgePath(a, b, bend) {
   return { d: `M${p0[0].toFixed(1)},${p0[1].toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p1[0].toFixed(1)},${p1[1].toFixed(1)}`, lx, ly };
 }
 
-function createStateMapView({ host, getEdm, getConfig, getAnchors }) {
+function createStateMapView({ host, getEdm, getConfig, getAnchors, pin = () => {} }) {
   host.innerHTML = `
     <div class="sm-toolbar">
       <button class="sm-zoom-out" title="Zoom out (−)">−</button>
@@ -7946,8 +7993,10 @@ function createStateMapView({ host, getEdm, getConfig, getAnchors }) {
     ui.expanded = on;
     host.classList.toggle('sm-expanded', on);
     $('.sm-expand').textContent = on ? 'Restore' : 'Expand';
-    if (on) place();
-    else Object.assign(host.style, { top: '', left: '' });
+    if (on) {
+      if (getAnchors().phone) pin(); // phones: pin the instrument at the very top so the map gets the rest
+      place();
+    } else Object.assign(host.style, { top: '', left: '' });
     requestAnimationFrame(() => (ui.cur ? centerOn(ui.cur, ui.k) : fit(false)));
   }
 
@@ -8233,7 +8282,7 @@ function gesture(kind) {
 function bindKeyboard() {
   const keyMap = { s: ['STEP'], l: ['LF'], b: ['STEP', 'LF'] };
   window.addEventListener('keydown', (e) => {
-    if (e.target.closest('input, select, textarea')) return;
+    if (e.target.closest('input, select, textarea') || document.querySelector('dialog[open]')) return;
     const k = e.key.toLowerCase();
     if (keyMap[k]) {
       if (!e.repeat) keyMap[k].forEach((b) => press(b, `key-${k}`));
@@ -8975,9 +9024,39 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
+// ------------------------------------------------------------------ disclaimer
+
+const DISCLAIMER_KEY = 'edm800-disclaimer-ack-v1';
+
+/** Not approved for training: a permanent banner, and a notice that must be acknowledged on the first visit. */
+function initDisclaimer() {
+  const dlg = $('#disclaimer');
+  const acknowledged = () => {
+    try {
+      return localStorage.getItem(DISCLAIMER_KEY) === '1';
+    } catch {
+      return false;
+    }
+  };
+  $('#btn-disclaimer').addEventListener('click', () => dlg.showModal());
+  $('#btn-disclaimer-ok').addEventListener('click', () => {
+    try {
+      localStorage.setItem(DISCLAIMER_KEY, '1');
+    } catch {
+      /* storage unavailable: the notice shows again next time */
+    }
+    dlg.close();
+  });
+  dlg.addEventListener('cancel', (e) => {
+    if (!acknowledged()) e.preventDefault(); // the first time it has to be acknowledged, not escaped
+  });
+  if (!acknowledged()) dlg.showModal();
+}
+
 // ------------------------------------------------------------------ init
 
 function init() {
+  initDisclaimer();
   const stored = loadStored();
   (stored?.done || []).forEach((d) => app.done.add(d));
   app.config = { ...CARDINAL_EDM_CONFIG, ...(stored?.config || {}), cylinders: 4, tit: 0 };
@@ -9009,6 +9088,10 @@ function init() {
     getAnchors: () => {
       const phone = matchMedia('(max-width: 719px)').matches;
       return phone ? { phone, top: Math.round($('.instrument').getBoundingClientRect().bottom) } : { phone, left: Math.round($('.panel').getBoundingClientRect().right + 8) };
+    },
+    pin: () => {
+      const y = $('.instrument').getBoundingClientRect().top;
+      if (y > 0) scrollBy(0, y);
     },
   });
   $$('#tabs button').forEach((b) =>

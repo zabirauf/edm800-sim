@@ -1,5 +1,5 @@
 // Responsive-layout and touch checks, run on every device project (no stored images needed).
-import { test, expect } from './fixtures.mjs';
+import { test, expect, PAGE_URL } from './fixtures.mjs';
 
 const TABS = ['cockpit', 'scenarios', 'lessons', 'diagnose', 'faults', 'instructor', 'menus', 'install', 'reference'];
 
@@ -210,4 +210,30 @@ test('state machine view: maps the machine, highlights the live state, zooms wit
   await page.locator('.sm-node.cur rect').click();
   await expect(page.locator('.sm-details')).toBeVisible();
   await expect(page.locator('.sm-details')).toContainText('the EDM is here');
+});
+
+test('disclaimer: a first visit must acknowledge it; the banner stays on every screen; Details reopens it', async ({ browser }, info) => {
+  const context = await browser.newContext(info.project.use);
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+  const dlg = page.locator('#disclaimer');
+  await expect(dlg).toBeVisible();
+  await expect(dlg).toContainText('not approved, certified or endorsed by the FAA');
+  await expect(dlg).toContainText('Not affiliated with');
+  await page.keyboard.press('Escape'); // cannot be skipped the first time
+  await expect(dlg).toBeVisible();
+  const box = await dlg.boundingBox();
+  const vp = page.viewportSize();
+  expect(box.x >= 0 && box.x + box.width <= vp.width + 1, 'notice fits the screen width').toBe(true);
+  await page.locator('#btn-disclaimer-ok').click();
+  await expect(dlg).toBeHidden();
+  await expect(page.locator('#disclaimer-banner')).toBeVisible();
+  await expect(page.locator('#disclaimer-banner')).toContainText(/not approved/i);
+  await page.reload();
+  await expect(dlg).toBeHidden(); // acknowledged once
+  await page.locator('#btn-disclaimer').click();
+  await expect(dlg).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dlg).toBeHidden();
+  await context.close();
 });

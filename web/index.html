@@ -19,6 +19,31 @@
   </div>
 </header>
 
+<div id="disclaimer-banner" class="disclaimer-banner" role="note">
+  <strong>Unofficial educational simulator.</strong>
+  <span class="dl-long">Not approved by the FAA or any aviation authority, not for flight-training credit or real-world
+    use, and not affiliated with or endorsed by J.P. Instruments, Cessna (Textron Aviation) or Lycoming. It may contain
+    errors — always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor.</span>
+  <span class="dl-short">Not approved for flight training · may contain errors.</span>
+  <button id="btn-disclaimer" class="linklike" type="button">Details</button>
+</div>
+
+<dialog id="disclaimer" class="disclaimer-dialog" aria-labelledby="disclaimer-title">
+  <h2 id="disclaimer-title">Before you start</h2>
+  <ul>
+    <li><b>Unofficial personal project</b> for familiarisation and study. It is <b>not approved, certified or endorsed by
+      the FAA or any other aviation authority</b>, and using it does not count toward any training, currency, rating or
+      certificate.</li>
+    <li><b>Not affiliated with, endorsed by or supported by J.P. Instruments, Textron Aviation (Cessna) or Lycoming.</b>
+      Product names are used only to describe what is being simulated.</li>
+    <li>The instrument behaviour and the engine model are <b>approximations and may be wrong</b>. Do not use this to make
+      decisions about a real aircraft or flight. Always follow the J.P. Instruments Pilot's Guide, the aircraft's POH/AFM,
+      the engine manufacturer's guidance and your flight instructor.</li>
+    <li>Provided "as is", without warranty of any kind (MIT License).</li>
+  </ul>
+  <div class="row"><button id="btn-disclaimer-ok" type="button" class="primary">I understand</button></div>
+</dialog>
+
 <main>
   <!-- ============================== instrument panel -->
   <section class="panel" id="panel">
@@ -259,8 +284,10 @@
 </aside>
 
 <footer>
-  Training aid only — not a substitute for the JPI Pilot's Guide, the Cessna 177B POH, Lycoming publications or flight
-  instruction. Model calibration and every assumption are documented in docs/06-ENGINE-SIM-PLAN.md and the Instructor tab.
+  Unofficial educational simulator — not approved by the FAA or any aviation authority, not for flight-training credit or
+  real-world use, and not affiliated with or endorsed by J.P. Instruments, Textron Aviation (Cessna) or Lycoming. It may
+  contain errors: always follow the JPI Pilot's Guide, the POH/AFM and your flight instructor. Provided as is (MIT License).
+  Model calibration and every assumption are documented in docs/06–09 of the project and in the Instructor tab.
 </footer>
 <script type="module" src="app.js"></script>
 </body>

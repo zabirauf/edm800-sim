@@ -5,6 +5,8 @@
 export function scrollToReach(e) {
   const inst = document.querySelector('.instrument');
   if (e.closest('.instrument')) return;
+  // controls in a fixed overlay (expanded state map, Explain sheet, step card) are always on screen: never scroll
+  for (let a = e; a; a = a.parentElement) if (getComputedStyle(a).position === 'fixed') return;
   if (getComputedStyle(inst).position !== 'sticky') return void e.scrollIntoView({ block: 'center' });
   const coach = document.getElementById('coach');
   const top = inst.getBoundingClientRect().height;
